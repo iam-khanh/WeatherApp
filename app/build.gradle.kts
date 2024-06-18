@@ -1,6 +1,8 @@
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
+    id("kotlin-kapt")
+    id ("kotlin-parcelize")
 }
 
 android {
@@ -36,6 +38,9 @@ android {
     buildFeatures {
         viewBinding = true
     }
+    kapt{
+        correctErrorTypes = true
+    }
 }
 
 dependencies {
@@ -64,12 +69,14 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-common-java8:2.6.1")
     implementation("androidx.lifecycle:lifecycle-extensions:2.2.0")
 
-   // Gson
+    // Gson
     implementation ("com.google.code.gson:gson:2.9.1")
 
+    // Thêm thư viện WeatherView
+    implementation ("com.github.MatteoBattilana:WeatherView:3.0.0")
 
-
-
-
-
+    //  ViewModel
+    implementation("androidx.activity:activity-ktx:1.4.0")
+    implementation ("com.github.Dimezis:BlurView:version-2.0.3")
+    implementation ("com.github.bumptech.glide:glide:4.12.0")
 }
