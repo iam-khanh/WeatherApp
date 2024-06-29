@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.weatherapp.databinding.ForecastViewholderBinding
 import com.example.weatherapp.model.ForecastReponseApi
 import java.text.SimpleDateFormat
@@ -56,6 +57,13 @@ class ForecastAdapter: RecyclerView.Adapter<ForecastAdapter.Viewholder>() {
             "50d", "50n" -> "windy"
             else -> "sunny"
         }
+        val drawableResourceId: Int = binding.root.resources.getIdentifier(
+            icon, "drawable", binding.root.context.packageName
+        )
+
+        Glide.with(binding.root.context)
+            .load(drawableResourceId)
+            .into(binding.imgholder)
     }
         inner class Viewholder: RecyclerView.ViewHolder(binding.root)
     override fun getItemCount() = differ.currentList.size
