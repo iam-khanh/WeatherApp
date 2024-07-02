@@ -1,7 +1,6 @@
-package com.example.weatherapp
+package com.example.weatherapp.Activity
 
 import android.annotation.SuppressLint
-import android.graphics.Color
 import android.icu.util.Calendar
 import android.os.Build
 import android.os.Build.*
@@ -11,7 +10,6 @@ import android.view.ViewGroup
 import android.view.ViewOutlineProvider
 import android.view.WindowInsets
 import android.view.WindowInsetsController
-import android.view.WindowManager
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
@@ -20,13 +18,13 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.weatherapp.Adapter.ForecastAdapter
+import com.example.weatherapp.R
 import com.example.weatherapp.ViewModel.WeatherViewModel
 import com.example.weatherapp.databinding.ActivityMainBinding
 import com.example.weatherapp.model.CurrentResponseApi
 import com.example.weatherapp.model.ForecastReponseApi
 import com.github.matteobattilana.weather.PrecipType
 import eightbitlab.com.blurview.RenderScriptBlur
-import okhttp3.Callback
 import retrofit2.Call
 import retrofit2.Response
 

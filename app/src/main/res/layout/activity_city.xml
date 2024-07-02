@@ -1,10 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
+    android:padding="10dp"
+    android:orientation="vertical"
     android:layout_height="match_parent"
-    tools:context=".CityActivity">
+    tools:context=".Activity.CityActivity">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <TextView
+        android:id="@+id/txtx"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Search Your City" />
+
+    <EditText
+        android:id="@+id/edtcity"
+        android:layout_width="match_parent"
+        android:height="50dp"
+        android:padding="8dp"
+        android:layout_marginTop="8dp"
+        android:textSize="12dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/edttext_bg"
+        android:textColorHint="@color/black"
+        android:ems="10"
+        android:hint="Type Your City"
+        android:inputType="text"
+        />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvcity"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="10dp" />
+</LinearLayout>
