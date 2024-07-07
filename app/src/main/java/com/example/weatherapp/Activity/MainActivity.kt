@@ -1,15 +1,19 @@
 package com.example.weatherapp.Activity
 
 import android.annotation.SuppressLint
+import android.content.Intent
+import android.graphics.Color
 import android.icu.util.Calendar
 import android.os.Build
 import android.os.Build.*
 import android.os.Bundle
+import android.provider.CalendarContract.Colors
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewOutlineProvider
 import android.view.WindowInsets
 import android.view.WindowInsetsController
+import android.view.WindowManager
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
@@ -30,7 +34,7 @@ import retrofit2.Response
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
-    private val weatherViewModel:WeatherViewModel by viewModels()
+    private val weatherViewModel: WeatherViewModel by viewModels()
     private val calendar by lazy { Calendar.getInstance() }
     private val forecastAdapter by lazy { ForecastAdapter() }
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,7 +44,7 @@ class MainActivity : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(binding.root)
 
-        // Kiểm tra phiên bản Android
+  // Kiểm tra phiên bản Android
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             // Sử dụng WindowInsetsController để ẩn thanh trạng thái và thanh điều hướng
             window.insetsController?.let {
@@ -57,23 +61,38 @@ class MainActivity : AppCompatActivity() {
                     )
         }
 
+        window.apply {
+            addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+            statusBarColor = Color.TRANSPARENT
+        }
+
         binding.apply {
-            var lat = 10.8231
-            var lon = 106.6297
-            var name = "Ho Chi Minh City"
+            var lat = intent.getDoubleExtra("lat", 0.0)
+            var lon = intent.getDoubleExtra("lon", 0.0)
+            var name = intent.getStringExtra("name")
+
+            if (lat == 0.0) {
+                lat = 10.8231
+                lon = 106.6297
+                name = "Ho Chi Minh City"
+            }
+
+            btnAddCity.setOnClickListener {
+                startActivity(Intent(this@MainActivity, CityActivity::class.java))
+            }
+
 
             // Current Temp
             txtcity.text = name
             progressBar.visibility = View.VISIBLE
-            weatherViewModel.loadCurrentWeather(lat,lon,"metric").enqueue(object :
+            weatherViewModel.loadCurrentWeather(lat, lon, "metric").enqueue(object :
                 retrofit2.Callback<CurrentResponseApi> {
                 @SuppressLint("SetTextI18n")
                 override fun onResponse(
                     call: Call<CurrentResponseApi>,
                     response: Response<CurrentResponseApi>
                 ) {
-                    if(response.isSuccessful)
-                    {
+                    if (response.isSuccessful) {
                         val data = response.body()
                         progressBar.visibility = View.GONE
                         detailLayout.visibility = View.VISIBLE
@@ -82,20 +101,21 @@ class MainActivity : AppCompatActivity() {
                             txtStatus.text = it.weather?.get(0)?.main ?: "-"
                             txtwind.text = it.wind?.speed?.let { Math.round(it).toString() } + "km"
                             txthummidity.text = it?.main?.humidity.toString() + "%"
-                            txtCurrentTemp.text=  it.main?.temp?.let { Math.round(it).toString() } + "°"
-                            txtmaxtemp.text=  it.main?.tempMax?.let { Math.round(it).toString() } + "°"
-                            txtmintemp.text=  it.main?.tempMin?.let { Math.round(it).toString() } + "°"
+                            txtCurrentTemp.text =
+                                it.main?.temp?.let { Math.round(it).toString() } + "°"
+                            txtmaxtemp.text =
+                                it.main?.tempMax?.let { Math.round(it).toString() } + "°"
+                            txtmintemp.text =
+                                it.main?.tempMin?.let { Math.round(it).toString() } + "°"
 
                             val drawable =
-                                if(isNightNow())
-                                {
+                                if (isNightNow()) {
                                     R.drawable.night_bg
-                                }else
-                                {
-                                    setDynamicallyWallpaper(it.weather?.get(0)?.icon?: "-")
+                                } else {
+                                    setDynamicallyWallpaper(it.weather?.get(0)?.icon ?: "-")
                                 }
                             bgimage.setImageResource(drawable)
-                            setEffectRainNow(it.weather?.get(0)?.icon?: "-")
+                            setEffectRainNow(it.weather?.get(0)?.icon ?: "-")
                         }
                     }
                 }
@@ -121,33 +141,33 @@ class MainActivity : AppCompatActivity() {
             }
 
             // forecast temp
-            weatherViewModel.loadForecastWeather(lat,lon,"metric").enqueue(object :retrofit2.Callback<ForecastReponseApi>{
-                override fun onResponse(
-                    call: Call<ForecastReponseApi>,
-                    response: Response<ForecastReponseApi>
-                ) {
-                    if( response.isSuccessful)
-                    {
-                        val data = response.body()
-                        blueview.visibility = View.VISIBLE
+            weatherViewModel.loadForecastWeather(lat, lon, "metric")
+                .enqueue(object : retrofit2.Callback<ForecastReponseApi> {
+                    override fun onResponse(
+                        call: Call<ForecastReponseApi>,
+                        response: Response<ForecastReponseApi>
+                    ) {
+                        if (response.isSuccessful) {
+                            val data = response.body()
+                            blueview.visibility = View.VISIBLE
 
-                        data?.let {
-                            forecastAdapter.differ.submitList(it.list)
-                            rvforecast.apply {
-                                layoutManager = LinearLayoutManager(
-                                    this@MainActivity, LinearLayoutManager.HORIZONTAL,
-                                    false
-                                )
-                                adapter = forecastAdapter
+                            data?.let {
+                                forecastAdapter.differ.submitList(it.list)
+                                rvforecast.apply {
+                                    layoutManager = LinearLayoutManager(
+                                        this@MainActivity, LinearLayoutManager.HORIZONTAL,
+                                        false
+                                    )
+                                    adapter = forecastAdapter
+                                }
                             }
                         }
                     }
-                }
 
-                override fun onFailure(call: Call<ForecastReponseApi>, t: Throwable) {
-                    TODO("Not yet implemented")
-                }
-            })
+                    override fun onFailure(call: Call<ForecastReponseApi>, t: Throwable) {
+                        TODO("Not yet implemented")
+                    }
+                })
 
         }
 
@@ -157,34 +177,40 @@ class MainActivity : AppCompatActivity() {
             insets
         }
     }
-    private fun isNightNow(): Boolean{
+
+    private fun isNightNow(): Boolean {
         return calendar.get(Calendar.HOUR_OF_DAY) >= 18
     }
 
-    private fun setDynamicallyWallpaper(icon: String): Int{
-            return when(icon.dropLast(1)){
-                "01" -> {
-                    initWeatherView(PrecipType.CLEAR)
-                    R.drawable.snow_bg
-                }
-                "02","03", "04" -> {
-                    initWeatherView(PrecipType.CLEAR)
-                    R.drawable.cloudy_bg
-                }
-                "09","10","11" -> {
-                    initWeatherView(PrecipType.RAIN)
-                    R.drawable.rainy_bg
-                }
-                "13" -> {
-                    initWeatherView(PrecipType.SNOW)
-                    R.drawable.snow_bg
-                }
-                "50" -> {
-                    initWeatherView(PrecipType.SNOW)
-                    R.drawable.haze_bg
-                }
-                else ->0
+    private fun setDynamicallyWallpaper(icon: String): Int {
+        return when (icon.dropLast(1)) {
+            "01" -> {
+                initWeatherView(PrecipType.CLEAR)
+                R.drawable.snow_bg
             }
+
+            "02", "03", "04" -> {
+                initWeatherView(PrecipType.CLEAR)
+                R.drawable.cloudy_bg
+            }
+
+            "09", "10", "11" -> {
+                initWeatherView(PrecipType.RAIN)
+                R.drawable.rainy_bg
+            }
+
+            "13" -> {
+                initWeatherView(PrecipType.SNOW)
+                R.drawable.snow_bg
+            }
+
+            "50" -> {
+                initWeatherView(PrecipType.SNOW)
+                R.drawable.haze_bg
+            }
+
+            else -> 0
+        }
     }
 
     private fun setEffectRainNow(icon: String) {
@@ -216,7 +242,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun initWeatherView(type: PrecipType){
+    private fun initWeatherView(type: PrecipType) {
         binding.WeatherView.apply {
             setWeatherData(type)
             angle = 20

@@ -31,22 +31,30 @@ class CityAdapter: RecyclerView.Adapter<CityAdapter.Viewholder>() {
     @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: CityAdapter.Viewholder, position: Int) {
         val binding = CityViewholderBinding.bind(holder.itemView)
+        binding.txtcityviewholder.text = differ.currentList[position].name
+        binding.root.setOnClickListener {
+            val intent = Intent(binding.root.context, MainActivity::class.java)
+            intent.putExtra("lat", differ.currentList[position].lat)
+            intent.putExtra("lon", differ.currentList[position].lon)
+            intent.putExtra("name", differ.currentList[position].name)
+            binding.root.context.startActivity(intent)
+        }
 
     }
         inner class Viewholder: RecyclerView.ViewHolder(binding.root)
     override fun getItemCount() = differ.currentList.size
 
-    private val differCallback = object : DiffUtil.ItemCallback<CityResponseApi>(){
+    private val differCallback = object : DiffUtil.ItemCallback<CityResponseApiItem>(){
         override fun areItemsTheSame(
-            oldItem: CityResponseApi,
-            newItem: CityResponseApi
+            oldItem: CityResponseApiItem,
+            newItem: CityResponseApiItem
         ): Boolean {
             return oldItem == newItem
         }
 
         override fun areContentsTheSame(
-            oldItem:  CityResponseApi,
-            newItem:  CityResponseApi
+            oldItem:  CityResponseApiItem,
+            newItem:  CityResponseApiItem
         ): Boolean {
             return oldItem == newItem
         }
